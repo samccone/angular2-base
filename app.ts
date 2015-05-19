@@ -4,7 +4,7 @@ import {Component, View, bootstrap, For, If} from 'angular2/angular2';
 class Store {
   todos: Array<{title: String, active: Boolean}>;
   constructor() {
-    this.todos = [{title: 'wow', active: true}, {title: 'such', active: false}, {title: 'list', active: true}];
+    this.todos = [{title: 'wow', active: false}, {title: 'such', active: false}, {title: 'list', active: false}];
   }
   remove(todo: {title: String, active: Boolean}) {
     for (let todo of this.todos) {
@@ -25,10 +25,11 @@ class Store {
 @View({
   directives: [For, If],
   template: `
+        <p *if="store.todos.length"> {{store.todos.length}} items </p>
         <ul class="todo-list">
           <li *for="#todo of store.todos" [class.active]="todo.active">
-            <p *if="todo.active" (click)="remove(todo)"> {{todo.title}}</p>
-            <p *if="!todo.active" (click)="remove(todo)"> wow not active</p>
+            <p *if="!todo.active" (click)="activate(todo)"> {{todo.title}}</p>
+            <input [value]="todo.title" *if="todo.active" #t (keyup.enter)="deactivate(t, todo)">
           </li>
         </ul>`
 })
@@ -36,6 +37,12 @@ class SampleApp{
   store: Store;
   constructor() {
     this.store = new Store();
+  }
+  activate(todo: {title: String, active: Boolean}) {
+    todo.active = true;
+  }
+  deactivate(element, todo: {title: String, active: Boolean}) {
+    store.remove(todo);
   }
   remove(todo: {title: String, active: Boolean}) {
     todo.active = !todo.active;
